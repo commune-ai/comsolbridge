@@ -8,4 +8,8 @@ pub enum BridgeError {
     ContractPaused,
     #[msg("Invalid Fee Collector")]
     InvalidFeeCollector,
+    #[msg("Invalid Mint")]
+    InvalidMint,
+    #[msg("Min Amount Not Met")]
+    MinAmountNotMet,
 }

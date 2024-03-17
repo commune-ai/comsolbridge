@@ -9,6 +9,7 @@ pub struct EmergencyPause<'info> {
     pub admin: Signer<'info>,
     /// CHECK::
     #[account(
+        mut,
         seeds = [b"bridge"],
         bump
     )]
@@ -22,7 +23,6 @@ pub fn handler(ctx: Context<EmergencyPause>, pause: bool) -> Result<()> {
         bridge.admin == *ctx.accounts.admin.key,
         BridgeError::Unauthorized
     );
-    let bridge = &mut ctx.accounts.bridge_pda;
     bridge.emergency_pause = pause;
     Ok(())
 }

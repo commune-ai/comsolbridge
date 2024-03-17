@@ -70,6 +70,9 @@ pub struct MintTokenPrams {
 
 pub fn handler(ctx: Context<MintToken>, params: MintTokenPrams) -> Result<()> {
     let bridge_pda = &ctx.accounts.bridge_pda;
+    let mint = &ctx.accounts.mint;
+
+    require!(bridge_pda.mint == mint.key(), BridgeError::InvalidMint);
 
     require!(
         ctx.accounts.bridge_pda.emergency_pause == false,
@@ -88,10 +91,11 @@ pub fn handler(ctx: Context<MintToken>, params: MintTokenPrams) -> Result<()> {
     };
     let cpi_program = ctx.accounts.token_program.to_account_info();
     let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
-    let fee_amount = params.amount as f32 * (bridge_pda.fee / 100.0);
-    let amount_to_mint = params.amount as f32 - fee_amount;
 
-    mint_to(cpi_ctx, amount_to_mint as u64)?;
+    let fee_amount = params.amount as f64 * (bridge_pda.fee as f64 / 100.0);
+    let amount_to_mint = params.amount - fee_amount as u64;
+
+    mint_to(cpi_ctx, amount_to_mint)?;
 
     // Mint revenue to fee collector account
     let cpi_accounts_fee = MintTo {

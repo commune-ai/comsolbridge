@@ -41,20 +41,23 @@ describe("Burn", async () => {
     program.programId
   );
 
+  const receiver = "zil15etcz530j7vtrzydk5gvjff6p0m3p89rsy7zjy";
+
   it("Burn", async () => {
     const tx = await program.methods
       .burn({
         amount: new anchor.BN(10 * LAMPORTS_PER_SOL),
+        receiver: receiver,
       })
       .accounts({
         mint: TOKEN_MINT,
-        burnAuthority: wallet.publicKey,
+        // burnAuthority: wallet.publicKey,
         source: sourceKeypair.publicKey,
         sourceAta: sourceAta,
         tokenProgram: TOKEN_PROGRAM_ID,
         bridgePda: bridgePda[0],
       })
-      .signers([wallet.payer, sourceKeypair])
+      .signers([sourceKeypair])
       .rpc();
     console.log("Transaction hash: ", tx);
   });

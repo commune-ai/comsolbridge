@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::Token,
+    token::{Mint, Token},
 };
 
 use crate::Bridge;
@@ -21,6 +21,7 @@ pub struct InitConfig<'info> {
     pub bridge_pda: Box<Account<'info, Bridge>>,
     /// CHECK::
     pub fee_vault: AccountInfo<'info>,
+    pub mint: Account<'info, Mint>,
     pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -29,6 +30,7 @@ pub struct InitConfig<'info> {
 #[derive(AnchorDeserialize, AnchorSerialize)]
 pub struct InitConfigParams {
     pub fee: f32,
+    pub min_bridge_amount: u64,
 }
 
 pub fn handler(ctx: Context<InitConfig>, params: InitConfigParams) -> Result<()> {
@@ -37,6 +39,8 @@ pub fn handler(ctx: Context<InitConfig>, params: InitConfigParams) -> Result<()>
     bridge.emergency_pause = false;
     bridge.admin = *ctx.accounts.admin.key;
     bridge.fee_vault = *ctx.accounts.fee_vault.key;
+    bridge.mint = *ctx.accounts.mint.to_account_info().key;
+    bridge.min_bridge_amount = params.min_bridge_amount;
 
     Ok(())
 }

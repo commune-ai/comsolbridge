@@ -1,28 +1,27 @@
+use crate::{Bridge, BridgeError};
 use anchor_lang::prelude::*;
 
-use crate::{Bridge, BridgeError};
-
 #[derive(Accounts)]
-pub struct SetFee<'info> {
+pub struct UpdateAdmin<'info> {
     #[account(mut)]
     /// CHECK::
     pub admin: Signer<'info>,
-    /// CHECK::
     #[account(
+        mut,
         seeds = [b"bridge"],
         bump
     )]
     pub bridge_pda: Box<Account<'info, Bridge>>,
+    /// CHECK::
+    pub new_admin: AccountInfo<'info>,
 }
 
-pub fn handler(ctx: Context<SetFee>, fee: f32, fee_vault: Pubkey) -> Result<()> {
+pub fn handler(ctx: Context<UpdateAdmin>) -> Result<()> {
     let bridge = &mut ctx.accounts.bridge_pda;
     require!(
         bridge.admin == *ctx.accounts.admin.key,
         BridgeError::Unauthorized
     );
-    let bridge = &mut ctx.accounts.bridge_pda;
-    bridge.fee = fee;
-    bridge.fee_vault = fee_vault;
+    bridge.admin = *ctx.accounts.new_admin.key;
     Ok(())
 }
