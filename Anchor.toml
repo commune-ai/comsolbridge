@@ -3,10 +3,10 @@ seeds = false
 skip-lint = false
 
 [programs.devnet]
-bridge_solana = "56aoBWVLjwpHD8HHS4i7hBicbznFGMdYjWPVBprVWi6k"
+bridge_solana = "D5m29tcpBYkr2Pqce1a5FfhEeQAaktr77pkPyCcY4inN"
 
 [programs.mainnet]
-bridge_solana = "56aoBWVLjwpHD8HHS4i7hBicbznFGMdYjWPVBprVWi6k"
+bridge_solana = "D5m29tcpBYkr2Pqce1a5FfhEeQAaktr77pkPyCcY4inN"
 
 [registry]
 url = "https://api.apr.dev"
@@ -14,7 +14,7 @@ url = "https://api.apr.dev"
 [provider]
 # cluster = "https://solana-api.syndica.io/access-token/uzvWwcrw5VkSnCLYSC7es8bC6uWcVU92YzMppv9w6Zny6arqbWpEEizr6IfTPE7e/rpc"
 cluster = "devnet"
-wallet = "/Users/chou/Developer/bridge-solana/tests/test_wallets/mainnet-admin.json"
+wallet = "/Users/chou/.config/solana/id.json"
 
 [scripts]
 mint = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/mint.ts"

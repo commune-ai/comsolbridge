@@ -14,29 +14,31 @@ pub struct MintToken<'info> {
         mint::authority = mint_authority,
     )]
     pub mint: Account<'info, Mint>,
-    // mint_authority
+    // The signer account authorized to mint tokens.
     #[account(mut)]
-    /// CHECK::
+    /// CHECK:: mint_authority is checked
     pub mint_authority: Signer<'info>,
     #[account(
-        seeds = [b"bridge"],
+        seeds = [b"bridge_commai"],
         bump
     )]
     pub bridge_pda: Box<Account<'info, Bridge>>,
-    // destination account
     #[account(mut)]
     /// CHECK::
+    /// The receiver account where the tokens will be minted.
     pub destination: AccountInfo<'info>,
     #[account(
         init,
         payer = mint_authority,
         space = 0,
-        seeds = [&params.index.to_le_bytes()],
+        seeds = [&params.hash.as_bytes()],
         bump
     )]
-    /// CHECK::
+    /// CHECK:: seeds has been checked
+    // This account is to validate if the minting is already processed or not for oracle.
+    // This account is used to prevent replay attacks. Same hash can't be used twice.
     pub check_account: AccountInfo<'info>,
-    // destination token account
+    // token account for destination
     #[account(
         init_if_needed,
         payer = mint_authority,
@@ -48,7 +50,8 @@ pub struct MintToken<'info> {
         mut,
         constraint = fee_vault.key() == bridge_pda.fee_vault,
     )]
-    /// CHECK::
+    /// CHECK:: checked if the fee vault is same as the bridge fee vault
+    // The fee vault account where the fees will be collected.
     pub fee_vault: AccountInfo<'info>,
     #[account(
         init_if_needed,
@@ -65,20 +68,23 @@ pub struct MintToken<'info> {
 #[derive(AnchorDeserialize, AnchorSerialize)]
 pub struct MintTokenPrams {
     pub amount: u64,
-    pub index: u64,
+    pub hash: String,
 }
 
 pub fn handler(ctx: Context<MintToken>, params: MintTokenPrams) -> Result<()> {
     let bridge_pda = &ctx.accounts.bridge_pda;
     let mint = &ctx.accounts.mint;
 
+    // check if the mint is same as the bridge config mint
     require!(bridge_pda.mint == mint.key(), BridgeError::InvalidMint);
 
+    // check if the bridge is not paused
     require!(
         ctx.accounts.bridge_pda.emergency_pause == false,
         crate::error::BridgeError::ContractPaused
     );
 
+    // check if the fee vault is same as the bridge fee vault
     require!(
         bridge_pda.fee_vault == *ctx.accounts.fee_vault.key,
         BridgeError::InvalidFeeCollector
@@ -92,7 +98,12 @@ pub fn handler(ctx: Context<MintToken>, params: MintTokenPrams) -> Result<()> {
     let cpi_program = ctx.accounts.token_program.to_account_info();
     let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
 
-    let fee_amount = params.amount as f64 * (bridge_pda.fee as f64 / 100.0);
+    let mut fee_amount = params.amount as f64 * (bridge_pda.fee as f64 / 100.0);
+
+    // Ensure that the fee amount is not less than the min fee amount
+    if fee_amount < bridge_pda.min_fee_amount as f64 {
+        fee_amount = bridge_pda.min_fee_amount as f64;
+    }
     let amount_to_mint = params.amount - fee_amount as u64;
 
     mint_to(cpi_ctx, amount_to_mint)?;

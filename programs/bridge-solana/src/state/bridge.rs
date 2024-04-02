@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 #[account]
-#[derive(Default, Debug)]
+#[derive(InitSpace)]
 pub struct Bridge {
     pub fee: f32,
     pub admin: Pubkey,
@@ -9,4 +9,5 @@ pub struct Bridge {
     pub fee_vault: Pubkey,
     pub mint: Pubkey,
     pub min_bridge_amount: u64,
+    pub min_fee_amount: u64,
 }

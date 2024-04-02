@@ -1,13 +1,18 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { BridgeSolana } from "../target/types/bridge_solana";
-import { PublicKey } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
   getAssociatedTokenAddress,
 } from "@solana/spl-token";
-import { FEE_VAULT, ORACLE_KEYPAIR, TOKEN_MINT } from "./shared";
+import {
+  DESTINATION_ADDRESS,
+  FEE_VAULT,
+  ORACLE_KEYPAIR,
+  TOKEN_MINT,
+} from "./shared";
 
 describe("bridge-solana", async () => {
   // Configure the client to use the local cluster.
@@ -18,10 +23,6 @@ describe("bridge-solana", async () => {
 
   const program = anchor.workspace.BridgeSolana as Program<BridgeSolana>;
   console.log("program: ", program.programId.toBase58());
-
-  const destinationAddress = new anchor.web3.PublicKey(
-    "Hxtg59VfeWVo4bEAuW9qm9qmN2y2yYBtH3P9WEyTifkX"
-  );
 
   const bridgePda = PublicKey.findProgramAddressSync(
     [Buffer.from(anchor.utils.bytes.utf8.encode("bridge"))],
@@ -36,24 +37,24 @@ describe("bridge-solana", async () => {
 
   const destinationTokenAccount = await getAssociatedTokenAddress(
     TOKEN_MINT,
-    destinationAddress,
+    DESTINATION_ADDRESS,
     true
   );
 
   it("Mint", async () => {
-    const index = 301;
+    const hash = "302";
     const checkAccount = PublicKey.findProgramAddressSync(
-      [new anchor.BN(index).toBuffer("le", 8)],
+      [Buffer.from(anchor.utils.bytes.utf8.encode(hash))],
       program.programId
     );
     const tx = await program.methods
       .mint({
-        amount: new anchor.BN(4815537890886079),
-        index: new anchor.BN(index),
+        amount: new anchor.BN(100000 * LAMPORTS_PER_SOL),
+        hash: hash,
       })
       .accounts({
         mint: TOKEN_MINT,
-        destination: destinationAddress,
+        destination: DESTINATION_ADDRESS,
         mintAuthority: ORACLE_KEYPAIR.publicKey,
         destinationAta: destinationTokenAccount,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -65,7 +66,9 @@ describe("bridge-solana", async () => {
         feeCollectorTokenAccount: feeCollectorTokenAccount,
       })
       .signers([ORACLE_KEYPAIR])
-      .rpc();
+      .rpc({
+        skipPreflight: true,
+      });
     console.log("Transaction hash: ", tx);
   });
 });

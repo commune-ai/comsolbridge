@@ -7,7 +7,7 @@ use error::*;
 mod state;
 use state::*;
 
-declare_id!("56aoBWVLjwpHD8HHS4i7hBicbznFGMdYjWPVBprVWi6k");
+declare_id!("D5m29tcpBYkr2Pqce1a5FfhEeQAaktr77pkPyCcY4inN");
 
 #[program]
 pub mod bridge_solana {

@@ -6,23 +6,23 @@ use crate::{Bridge, BridgeError};
 #[derive(Accounts)]
 pub struct UpdateTokenConfig<'info> {
     #[account(mut)]
-    /// CHECK::
     pub admin: Signer<'info>,
-    /// CHECK::
     #[account(
         mut,
-        seeds = [b"bridge"],
+        seeds = [b"bridge_commai"],
         bump
     )]
     pub bridge_pda: Box<Account<'info, Bridge>>,
     pub mint: Account<'info, Mint>,
-    /// CHECK::
+    /// CHECK:: admin is checked
     pub fee_vault: AccountInfo<'info>,
 }
 
 pub fn handler(ctx: Context<UpdateTokenConfig>, fee: f32, min_bridge_amount: u64) -> Result<()> {
     let bridge = &mut ctx.accounts.bridge_pda;
     let fee_vault = &ctx.accounts.fee_vault;
+
+    // Ensure that the sender is authorized to update the config.
     require!(
         bridge.admin == *ctx.accounts.admin.key,
         BridgeError::Unauthorized

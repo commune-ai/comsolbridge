@@ -5,10 +5,11 @@ use crate::{Bridge, BridgeError};
 
 #[derive(Accounts)]
 pub struct BurnToken<'info> {
+    // The mint account of the token to be burned.
     #[account(mut)]
     pub mint: Account<'info, Mint>,
     #[account(
-        seeds = [b"bridge"],
+        seeds = [b"bridge_commai"],
         bump
     )]
     pub bridge_pda: Box<Account<'info, Bridge>>,
@@ -44,10 +45,13 @@ pub fn handler(ctx: Context<BurnToken>, params: BurnTokenParams) -> Result<()> {
     let source = &ctx.accounts.source;
     let mint: &Account<'_, Mint> = &ctx.accounts.mint;
 
+    // check if the bridge is paused
     require!(bridge.emergency_pause == false, BridgeError::ContractPaused);
 
+    // check if the mint is same as the bridge config mint
     require!(bridge.mint == mint.key(), BridgeError::InvalidMint);
 
+    // check if the amount is less than the min bridge amount
     require!(
         bridge.min_bridge_amount <= params.amount,
         BridgeError::MinAmountNotMet
@@ -62,6 +66,7 @@ pub fn handler(ctx: Context<BurnToken>, params: BurnTokenParams) -> Result<()> {
     let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
     burn(cpi_ctx, params.amount)?;
 
+    // Emit BurnEvent
     emit!(BurnEvent {
         from: *source.key,
         amount: params.amount,

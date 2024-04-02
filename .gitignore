@@ -6,5 +6,6 @@ target
 node_modules
 test-ledger
 .yarn
-tests/test_wallets
+test_wallets
 admin
+

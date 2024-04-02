@@ -2,7 +2,7 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { BridgeSolana } from "../target/types/bridge_solana";
 import { IDL } from "../target/types/bridge_solana";
-import { PublicKey } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
@@ -20,14 +20,14 @@ describe("Init Config", async () => {
 
   const program = new anchor.Program(
     IDL,
-    new anchor.web3.PublicKey("56aoBWVLjwpHD8HHS4i7hBicbznFGMdYjWPVBprVWi6k"),
+    new anchor.web3.PublicKey("D5m29tcpBYkr2Pqce1a5FfhEeQAaktr77pkPyCcY4inN"),
     provider
   ) as Program<BridgeSolana>;
   console.log("Program ID: ", program.programId.toBase58());
 
   const adminKeypair = ADMIN_KEYPAIR;
   const bridgePda = PublicKey.findProgramAddressSync(
-    [Buffer.from(anchor.utils.bytes.utf8.encode("bridge"))],
+    [Buffer.from(anchor.utils.bytes.utf8.encode("bridge_commai"))],
     program.programId
   );
 
@@ -35,7 +35,8 @@ describe("Init Config", async () => {
     const tx = await program.methods
       .initConfig({
         fee: 0.5,
-        minBridgeAmount: new anchor.BN(540000000000000),
+        minBridgeAmount: new anchor.BN(2 * LAMPORTS_PER_SOL),
+        minFeeAmount: new anchor.BN(LAMPORTS_PER_SOL),
       })
       .accounts({
         admin: adminKeypair.publicKey,
@@ -57,5 +58,6 @@ describe("Init Config", async () => {
     console.log("fee: ", bridgeData.fee);
     console.log("minBridgeAmount: ", bridgeData.minBridgeAmount.toNumber());
     console.log("mint ", bridgeData.mint.toBase58());
+    console.log("minFeeAmount: ", bridgeData.minFeeAmount.toNumber());
   });
 });
