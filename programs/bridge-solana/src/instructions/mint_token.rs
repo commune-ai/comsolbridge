@@ -98,11 +98,11 @@ pub fn handler(ctx: Context<MintToken>, params: MintTokenPrams) -> Result<()> {
     let cpi_program = ctx.accounts.token_program.to_account_info();
     let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
 
-    let mut fee_amount = params.amount as f64 * (bridge_pda.fee as f64 / 100.0);
+    let mut fee_amount = (params.amount as u64 * bridge_pda.fee as u64) / 10000;
 
     // Ensure that the fee amount is not less than the min fee amount
-    if fee_amount < bridge_pda.min_fee_amount as f64 {
-        fee_amount = bridge_pda.min_fee_amount as f64;
+    if fee_amount < bridge_pda.min_fee_amount {
+        fee_amount = bridge_pda.min_fee_amount;
     }
     let amount_to_mint = params.amount - fee_amount as u64;
 

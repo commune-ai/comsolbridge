@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 #[account]
 #[derive(InitSpace)]
 pub struct Bridge {
-    pub fee: f32,
+    pub fee: u32,
     pub admin: Pubkey,
     pub emergency_pause: bool,
     pub fee_vault: Pubkey,

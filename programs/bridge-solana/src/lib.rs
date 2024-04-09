@@ -7,7 +7,7 @@ use error::*;
 mod state;
 use state::*;
 
-declare_id!("D5m29tcpBYkr2Pqce1a5FfhEeQAaktr77pkPyCcY4inN");
+declare_id!("A7EAge4jj5xNdXUnALwg4ucbECvU66M2kPS8ueD9VhCW");
 
 #[program]
 pub mod bridge_solana {
@@ -31,10 +31,11 @@ pub mod bridge_solana {
 
     pub fn update_token_config(
         ctx: Context<UpdateTokenConfig>,
-        fee: f32,
+        fee: u32,
         min_bridge_amount: u64,
+        min_fee_amount: u64,
     ) -> Result<()> {
-        update_token_config::handler(ctx, fee, min_bridge_amount)
+        update_token_config::handler(ctx, fee, min_bridge_amount, min_fee_amount)
     }
 
     pub fn update_admin(ctx: Context<UpdateAdmin>) -> Result<()> {

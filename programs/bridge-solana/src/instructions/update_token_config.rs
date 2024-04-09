@@ -18,7 +18,12 @@ pub struct UpdateTokenConfig<'info> {
     pub fee_vault: AccountInfo<'info>,
 }
 
-pub fn handler(ctx: Context<UpdateTokenConfig>, fee: f32, min_bridge_amount: u64) -> Result<()> {
+pub fn handler(
+    ctx: Context<UpdateTokenConfig>,
+    fee: u32,
+    min_bridge_amount: u64,
+    min_fee_amount: u64,
+) -> Result<()> {
     let bridge = &mut ctx.accounts.bridge_pda;
     let fee_vault = &ctx.accounts.fee_vault;
 
@@ -31,5 +36,6 @@ pub fn handler(ctx: Context<UpdateTokenConfig>, fee: f32, min_bridge_amount: u64
     bridge.fee_vault = fee_vault.key();
     bridge.min_bridge_amount = min_bridge_amount;
     bridge.mint = *ctx.accounts.mint.to_account_info().key;
+    bridge.min_fee_amount = min_fee_amount;
     Ok(())
 }

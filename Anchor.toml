@@ -3,10 +3,10 @@ seeds = false
 skip-lint = false
 
 [programs.devnet]
-bridge_solana = "D5m29tcpBYkr2Pqce1a5FfhEeQAaktr77pkPyCcY4inN"
+bridge_solana = "A7EAge4jj5xNdXUnALwg4ucbECvU66M2kPS8ueD9VhCW"
 
 [programs.mainnet]
-bridge_solana = "D5m29tcpBYkr2Pqce1a5FfhEeQAaktr77pkPyCcY4inN"
+bridge_solana = "A7EAge4jj5xNdXUnALwg4ucbECvU66M2kPS8ueD9VhCW"
 
 [registry]
 url = "https://api.apr.dev"

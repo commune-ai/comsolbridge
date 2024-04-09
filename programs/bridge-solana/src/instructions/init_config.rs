@@ -31,7 +31,7 @@ pub struct InitConfig<'info> {
 
 #[derive(AnchorDeserialize, AnchorSerialize)]
 pub struct InitConfigParams {
-    pub fee: f32,
+    pub fee: u32,
     pub min_bridge_amount: u64,
     pub min_fee_amount: u64,
 }
