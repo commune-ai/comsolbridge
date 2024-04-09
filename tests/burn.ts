@@ -4,7 +4,11 @@ import { BridgeSolana } from "../target/types/bridge_solana";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress } from "@solana/spl-token";
 import fs from "fs";
-import { SOURCE_KEYPAIR, TOKEN_MINT } from "./shared";
+import {
+  DESTINATION_ADDRESS_COMMSOL,
+  SOURCE_KEYPAIR,
+  TOKEN_MINT,
+} from "./shared";
 
 describe("Burn", async () => {
   // Configure the client to use the local cluster.
@@ -16,7 +20,7 @@ describe("Burn", async () => {
   const program = anchor.workspace.BridgeSolana as Program<BridgeSolana>;
 
   const sourceAta = await getAssociatedTokenAddress(
-    TOKEN_MINT,
+    TOKEN_MINT.address,
     SOURCE_KEYPAIR.publicKey,
     true
   );
@@ -26,16 +30,14 @@ describe("Burn", async () => {
     program.programId
   );
 
-  const receiver = "zil15etcz530j7vtrzydk5gvjff6p0m3p89rsy7zjy";
-
   it("Burn", async () => {
     const tx = await program.methods
       .burn({
         amount: new anchor.BN(10 * LAMPORTS_PER_SOL),
-        receiver: receiver,
+        receiver: DESTINATION_ADDRESS_COMMSOL,
       })
       .accounts({
-        mint: TOKEN_MINT,
+        mint: TOKEN_MINT.address,
         // burnAuthority: wallet.publicKey,
         source: SOURCE_KEYPAIR.publicKey,
         sourceAta: sourceAta,

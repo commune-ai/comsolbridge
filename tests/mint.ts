@@ -30,13 +30,13 @@ describe("bridge-solana", async () => {
   );
 
   const feeCollectorTokenAccount = await getAssociatedTokenAddress(
-    TOKEN_MINT,
+    TOKEN_MINT.address,
     FEE_VAULT,
     true
   );
 
   const destinationTokenAccount = await getAssociatedTokenAddress(
-    TOKEN_MINT,
+    TOKEN_MINT.address,
     DESTINATION_ADDRESS,
     true
   );
@@ -53,7 +53,7 @@ describe("bridge-solana", async () => {
         hash: hash,
       })
       .accounts({
-        mint: TOKEN_MINT,
+        mint: TOKEN_MINT.address,
         destination: DESTINATION_ADDRESS,
         mintAuthority: ORACLE_KEYPAIR.publicKey,
         destinationAta: destinationTokenAccount,

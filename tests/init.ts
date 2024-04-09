@@ -8,7 +8,6 @@ import {
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { ADMIN_KEYPAIR, FEE_VAULT, TOKEN_MINT } from "./shared";
-import { assert } from "chai";
 
 describe("Init Config", async () => {
   // Configure the client to use the local cluster.
@@ -20,7 +19,7 @@ describe("Init Config", async () => {
 
   const program = new anchor.Program(
     IDL,
-    new anchor.web3.PublicKey("D5m29tcpBYkr2Pqce1a5FfhEeQAaktr77pkPyCcY4inN"),
+    anchor.workspace.BridgeSolana.programId.toBase58(),
     provider
   ) as Program<BridgeSolana>;
   console.log("Program ID: ", program.programId.toBase58());
@@ -34,8 +33,8 @@ describe("Init Config", async () => {
   it("Init", async () => {
     const tx = await program.methods
       .initConfig({
-        fee: 0.5,
-        minBridgeAmount: new anchor.BN(2 * LAMPORTS_PER_SOL),
+        fee: 30,
+        minBridgeAmount: new anchor.BN(10 * LAMPORTS_PER_SOL),
         minFeeAmount: new anchor.BN(LAMPORTS_PER_SOL),
       })
       .accounts({
@@ -45,7 +44,7 @@ describe("Init Config", async () => {
         systemProgram: anchor.web3.SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
         feeVault: FEE_VAULT,
-        mint: TOKEN_MINT,
+        mint: TOKEN_MINT.address,
       })
       .signers([adminKeypair])
       .rpc();
