@@ -11,8 +11,8 @@ pub struct UpdateAdmin<'info> {
         bump
     )]
     pub bridge_pda: Box<Account<'info, Bridge>>,
-    /// CHECK:: admin is checked
-    pub new_admin: AccountInfo<'info>,
+    #[account(mut)]
+    pub new_admin: Signer<'info>,
 }
 
 pub fn handler(ctx: Context<UpdateAdmin>) -> Result<()> {
